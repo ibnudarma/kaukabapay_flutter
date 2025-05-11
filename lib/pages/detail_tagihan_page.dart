@@ -162,13 +162,58 @@ class _DetailTagihanPageState extends State<DetailTagihanPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const NotifikasiTagihan(),
-                              ),
-                            );
+                          onPressed: () async {
+                            final token = await TokenService.getToken();
+                            try {
+                              final response = await http.post(
+                                Uri.parse(
+                                  'http://34.101.197.61/api/siswa/bayar',
+                                ),
+                                headers: {
+                                  'Authorization': 'Bearer $token',
+                                  'Content-Type': 'application/json',
+                                },
+                                body: jsonEncode({
+                                  'id_tagihan': widget.id_tagihan,
+                                }),
+                              );
+
+                              final responseData = json.decode(response.body);
+                              if (response.statusCode == 200 &&
+                                  responseData['status'] == true) {
+                                // Pembayaran berhasil, arahkan ke halaman notifikasi
+                                if (!mounted) return;
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const NotifikasiTagihan(),
+                                  ),
+                                );
+                              } else {
+                                // Tampilkan pesan error
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      responseData['message'] ??
+                                          'Pembayaran gagal.',
+                                    ),
+                                    backgroundColor: Colors.redAccent,
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Terjadi kesalahan saat memproses pembayaran.',
+                                  ),
+                                  backgroundColor: Colors.redAccent,
+                                ),
+                              );
+                            }
                           },
                           child: const Text(
                             'Bayar Sekarang',
