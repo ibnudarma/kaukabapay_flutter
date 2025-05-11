@@ -1,17 +1,60 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../services/token_service.dart';
 import 'detail_tagihan_page.dart';
 
-class TagihanPage extends StatelessWidget {
+class TagihanPage extends StatefulWidget {
   const TagihanPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<Map<String, String>> dataTagihan = [
-      {'bulan': 'Januari', 'tagihan': 'Rp500.000', 'status': 'Belum Lunas'},
-      {'bulan': 'Februari', 'tagihan': 'Rp450.000', 'status': 'Lunas'},
-      {'bulan': 'Maret', 'tagihan': 'Rp520.000', 'status': 'Belum Lunas'},
-    ];
+  State<TagihanPage> createState() => _TagihanPageState();
+}
 
+class _TagihanPageState extends State<TagihanPage> {
+  List<dynamic> tagihanList = [];
+  bool isLoading = true;
+  String? errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTagihan();
+  }
+
+  Future<void> fetchTagihan() async {
+    try {
+      final token = await TokenService.getToken();
+      final response = await http.get(
+        Uri.parse('http://34.101.197.61/api/siswa/tagihan'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      final data = json.decode(response.body);
+      if (response.statusCode == 200 && data['status'] == true) {
+        setState(() {
+          tagihanList = data['data'];
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = data['message'] ?? 'Gagal mengambil data tagihan';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Terjadi kesalahan koneksi.';
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.greenAccent,
@@ -25,102 +68,69 @@ class TagihanPage extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          const Text(
-            'TAGIHAN BULANAN',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child:
-                dataTagihan.isNotEmpty
-                    ? ListView.builder(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemCount: dataTagihan.length,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : errorMessage != null
+              ? Center(child: Text(errorMessage!))
+              : tagihanList.isEmpty
+                  ? const Center(child: Text('Tidak ada data tagihan'))
+                  : ListView.builder(
+                      itemCount: tagihanList.length,
+                      padding: const EdgeInsets.all(12),
                       itemBuilder: (context, index) {
-                        final data = dataTagihan[index];
-                        final status = data['status']!;
-                        final isLunas = status == 'Lunas';
-                        final badgeColor =
-                            isLunas ? Colors.green : Colors.yellow;
-                        final badgeTextColor =
-                            isLunas ? Colors.white : Colors.black;
+                        final item = tagihanList[index];
+                        final status = item['status'] ?? 'Belum Diketahui';
+                        final isLunas = status.toLowerCase() == 'lunas';
+                        final jenisTagihan = item['jenis_tagihan'] ?? 'Tidak diketahui';
+                        final jumlah = item['jumlah'] ?? 0;
+                        final id_tagihan = item['id_tagihan'];
 
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 4,
-                          ),
-                          child: Card(
-                            elevation: 4,
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              title: Text(
-                                data['bulan']!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Jumlah: ${data['tagihan']!}'),
-                                  const SizedBox(height: 4),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: badgeColor,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      status,
-                                      style: TextStyle(
-                                        color: badgeTextColor,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                        return Card(
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          child: ListTile(
+                            title: Text(jenisTagihan),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Jumlah: Rp$jumlah'),
+                                const SizedBox(height: 4),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: isLunas ? Colors.green : Colors.yellow,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    status,
+                                    style: TextStyle(
+                                      color: isLunas ? Colors.white : Colors.black,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                ],
-                              ),
-                              trailing: const Icon(
-                                Icons.arrow_forward_ios,
-                                size: 16,
-                              ),
-                              onTap: () {
+                                ),
+                              ],
+                            ),
+                            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                            onTap: () {
+                              if (id_tagihan != null) {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder:
-                                        (context) => DetailTagihanPage(
-                                          bulan: data['bulan']!,
-                                          jumlahTagihan: data['tagihan']!,
-                                        ),
+                                    builder: (context) => DetailTagihanPage(
+                                      id_tagihan: id_tagihan,
+                                      bulan: jenisTagihan,
+                                      jumlahTagihan: 'Rp$jumlah',
+                                    ),
                                   ),
                                 );
-                              },
-                            ),
+                              }
+                            },
                           ),
                         );
                       },
-                    )
-                    : const Center(
-                      child: Text(
-                        'Tidak ada data tagihan',
-                        style: TextStyle(fontSize: 16),
-                      ),
                     ),
-          ),
-        ],
-      ),
     );
   }
 }

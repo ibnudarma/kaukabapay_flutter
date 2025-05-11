@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/riwayat_pembayaran_page.dart';
+import 'package:flutter_application_1/services/token_service.dart';
 import 'profile_page.dart';
 import 'login_page.dart';
 import 'tagihan_page.dart';
@@ -52,40 +53,7 @@ class HomePage extends StatelessWidget {
                       'Riwayat Pembayaran',
                       const RiwayatPembayaranPage(),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => LoginPage()),
-                        );
-                      },
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 5,
-                                  spreadRadius: 2,
-                                  offset: Offset(2, 2),
-                                ),
-                              ],
-                            ),
-                            child: Image.asset(
-                              'assets/signout.png',
-                              width: 60,
-                              height: 60,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text('Keluar', style: TextStyle(fontSize: 14)),
-                        ],
-                      ),
-                    ),
+                    _buildLogoutButton(context),
                   ],
                 ),
               ),
@@ -126,6 +94,41 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(label, style: const TextStyle(fontSize: 14)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        await TokenService.removeToken();
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => LoginPage()),
+          (route) => false,
+        );
+      },
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 5,
+                  spreadRadius: 2,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: Image.asset('assets/signout.png', width: 60, height: 60),
+          ),
+          const SizedBox(height: 8),
+          const Text('Keluar', style: TextStyle(fontSize: 14)),
         ],
       ),
     );
