@@ -57,7 +57,7 @@ class _TagihanPageState extends State<TagihanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: const Color(0xFF00BF63),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -68,69 +68,75 @@ class _TagihanPageState extends State<TagihanPage> {
         ),
         centerTitle: true,
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : errorMessage != null
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : errorMessage != null
               ? Center(child: Text(errorMessage!))
               : tagihanList.isEmpty
-                  ? const Center(child: Text('Tidak ada data tagihan'))
-                  : ListView.builder(
-                      itemCount: tagihanList.length,
-                      padding: const EdgeInsets.all(12),
-                      itemBuilder: (context, index) {
-                        final item = tagihanList[index];
-                        final status = item['status'] ?? 'Belum Diketahui';
-                        final isLunas = status.toLowerCase() == 'lunas';
-                        final jenisTagihan = item['jenis_tagihan'] ?? 'Tidak diketahui';
-                        final jumlah = item['jumlah'] ?? 0;
-                        final id_tagihan = item['id_tagihan'];
+              ? const Center(child: Text('Tidak ada data tagihan'))
+              : ListView.builder(
+                itemCount: tagihanList.length,
+                padding: const EdgeInsets.all(12),
+                itemBuilder: (context, index) {
+                  final item = tagihanList[index];
+                  final status = item['status'] ?? 'Belum Diketahui';
+                  final isLunas = status.toLowerCase() == 'lunas';
+                  final jenisTagihan =
+                      item['jenis_tagihan'] ?? 'Tidak diketahui';
+                  final jumlah = item['jumlah'] ?? 0;
+                  final id_tagihan = item['id_tagihan'];
 
-                        return Card(
-                          elevation: 4,
-                          margin: const EdgeInsets.symmetric(vertical: 6),
-                          child: ListTile(
-                            title: Text(jenisTagihan),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Jumlah: Rp$jumlah'),
-                                const SizedBox(height: 4),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: isLunas ? Colors.green : Colors.yellow,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    status,
-                                    style: TextStyle(
-                                      color: isLunas ? Colors.white : Colors.black,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                  return Card(
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    child: ListTile(
+                      title: Text(jenisTagihan),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Jumlah: Rp$jumlah'),
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
                             ),
-                            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                            onTap: () {
-                              if (id_tagihan != null) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DetailTagihanPage(
-                                      id_tagihan: id_tagihan,
-                                      bulan: jenisTagihan,
-                                      jumlahTagihan: 'Rp$jumlah',
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
+                            decoration: BoxDecoration(
+                              color: isLunas ? Colors.green : Colors.yellow,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              status,
+                              style: TextStyle(
+                                color: isLunas ? Colors.white : Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        );
+                        ],
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      onTap: () {
+                        if (id_tagihan != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => DetailTagihanPage(
+                                    id_tagihan: id_tagihan,
+                                    bulan: jenisTagihan,
+                                    jumlahTagihan: 'Rp$jumlah',
+                                  ),
+                            ),
+                          );
+                        }
                       },
                     ),
+                  );
+                },
+              ),
     );
   }
 }

@@ -1,21 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailPembayaranPage extends StatelessWidget {
   final String id;
   final String jumlah;
   final String tanggal;
+  final String tagihan;
+  final String metode;
 
   const DetailPembayaranPage({
     super.key,
     required this.id,
     required this.jumlah,
     required this.tanggal,
+    required this.tagihan,
+    required this.metode,
   });
+
+  Future<void> openInBrowser(BuildContext context) async {
+    final url = 'https://kaukabapay.biz.id/pembayaran/cetak/$id';
+    final uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Tidak dapat membuka browser')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFDE7),
       appBar: AppBar(
         backgroundColor: const Color(0xFF00BF63),
         elevation: 0,
@@ -50,16 +67,17 @@ class DetailPembayaranPage extends StatelessWidget {
                     vertical: 24,
                   ),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _buildCenteredDetail('ID Pembayaran', id),
+                      _buildDetailRow('ID Pembayaran', id),
                       const Divider(),
-                      _buildCenteredDetail('Jumlah Pembayaran', jumlah),
+                      _buildDetailRow('Jumlah Pembayaran', jumlah),
                       const Divider(),
-                      _buildCenteredDetail('Tanggal Pembayaran', tanggal),
+                      _buildDetailRow('Tanggal Pembayaran', tanggal),
                       const Divider(),
-                      _buildCenteredDetail('Nama Siswa', 'Budi Santoso'),
+                      _buildDetailRow('Nama Tagihan', tagihan),
                       const Divider(),
-                      _buildCenteredDetail('Status Pembayaran', 'Sudah Lunas'),
+                      _buildDetailRow('Metode Pembayaran', metode),
                     ],
                   ),
                 ),
@@ -68,11 +86,9 @@ class DetailPembayaranPage extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Aksi cetak bisa ditambahkan di sini
-                  },
+                  onPressed: () => openInBrowser(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF72F2B9),
+                    backgroundColor: const Color(0xFF00BF63),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -83,7 +99,7 @@ class DetailPembayaranPage extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  child: const Text('Cetak Bukti Pembayaran'),
+                  child: const Text('Unduh Bukti Pembayaran'),
                 ),
               ),
               const SizedBox(height: 16),
@@ -94,29 +110,28 @@ class DetailPembayaranPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCenteredDetail(String label, String value) {
+  Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w600,
               color: Colors.black54,
             ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
           Text(
-            value,
+            value.isNotEmpty ? value : '-',
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: Colors.black87,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),

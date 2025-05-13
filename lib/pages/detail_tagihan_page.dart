@@ -67,9 +67,8 @@ class _DetailTagihanPageState extends State<DetailTagihanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFDE7),
       appBar: AppBar(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: const Color(0xFF00BF63),
         elevation: 4,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -155,7 +154,7 @@ class _DetailTagihanPageState extends State<DetailTagihanPage> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.greenAccent,
+                            backgroundColor: const Color(0xFF00BF63),
                             foregroundColor: Colors.black,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(

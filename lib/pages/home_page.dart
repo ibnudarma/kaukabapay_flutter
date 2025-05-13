@@ -1,12 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/riwayat_pembayaran_page.dart';
-import 'package:flutter_application_1/services/token_service.dart';
+import 'package:kaukabapay_app/pages/riwayat_pembayaran_page.dart';
+import 'package:kaukabapay_app/services/token_service.dart';
+import 'package:kaukabapay_app/services/auth_service.dart';
 import 'profile_page.dart';
 import 'login_page.dart';
 import 'tagihan_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkTokenValidity(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +95,7 @@ class HomePage extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 5,
@@ -116,7 +130,7 @@ class HomePage extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 5,
