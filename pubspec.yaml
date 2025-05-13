@@ -31,10 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.4.0
-  permission_handler: ^11.3.0
   shared_preferences: ^2.5.3
-  flutter_pdfview: ^1.4.0+1
-  path_provider: ^2.1.5
   url_launcher: ^6.3.1
 
   # The following adds the Cupertino Icons font to your application.
@@ -49,7 +46,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/app_icon.png"
+  image_path: "assets/kaukabapay.png"
 
 
 

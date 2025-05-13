@@ -17,7 +17,7 @@ class DetailPembayaranPage extends StatelessWidget {
     required this.metode,
   });
 
-  Future<void> openInBrowser(BuildContext context) async {
+  Future<void> openInBrowser(BuildContext context, String id) async {
     final url = 'https://kaukabapay.biz.id/pembayaran/cetak/$id';
     final uri = Uri.parse(url);
 
@@ -86,7 +86,7 @@ class DetailPembayaranPage extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => openInBrowser(context),
+                  onPressed: () => openInBrowser(context, id),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF00BF63),
                     foregroundColor: Colors.white,
